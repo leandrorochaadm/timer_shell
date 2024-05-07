@@ -44,6 +44,7 @@ pause_timer() {
 
 # Função para verificar o tempo total acumulado até agora sem pausar
 check_timer() {
+echo $(cat "$ACCU_FILE")
     if [ ! -f "$FILE" ] && [ -f "$ACCU_FILE" ];then
         total_seconds=$(cat "$ACCU_FILE")
         echo "Tempo total acumulado até agora: $(($total_seconds / 3600)) hora(s) e $((($total_seconds % 3600) / 60)) minuto(s)."
@@ -57,9 +58,8 @@ check_timer() {
         elapsed_seconds=$((current_time - start_time))
         total_seconds=$((accumulated_seconds + elapsed_seconds))
         echo "Tempo total acumulado até agora: $(($total_seconds / 3600)) hora(s) e $((($total_seconds % 3600) / 60)) minuto(s)."
-    fi
-
-    if [ ! -f "$FILE" ] || [ ! -f "$ACCU_FILE" ]; then
+        exit 1
+    else
         echo "Primeiro é necessário iniciar o cronômetro, usando o comando 'start'"
         exit 1
     fi
