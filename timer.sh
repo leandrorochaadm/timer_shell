@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Caminho do arquivo onde o timestamp e o tempo acumulado serão salvos
 FILE=".timer_timestamp.txt"
@@ -13,8 +13,33 @@ format_time() {
     echo "$hours hora(s), $minutes minuto(s) e $seconds segundo(s)"
 }
 
+# Função que converte hora no formato "hh:MM" para timestamp Unix
+get_timestamp_from_time() {
+    local time="$1"  # Recebe o horário como parâmetro
+    local today=$(date +%Y-%m-%d)  # Data de hoje
+    local timestamp
+
+    # Tentar GNU date primeiro
+    timestamp=$(date -d "$today $time" +%s 2>/dev/null)
+
+    # Se falhar, tentar BSD date
+    if [ -z "$timestamp" ]; then
+        timestamp=$(date -j -f "%Y-%m-%d %H:%M" "$today $time" +%s 2>/dev/null)
+    fi
+
+    # Checar se o timestamp foi gerado com sucesso
+    if [ -z "$timestamp" ]; then
+        echo "Erro ao converter a hora para timestamp."
+        return 1
+    else
+        echo $timestamp
+    fi
+}
+
 # Função para iniciar ou continuar o timer
 start_timer() {
+    local start_time="$1"
+
     if [ -f "$ACCU_FILE" ]; then
        accumulated_seconds=$(cat "$ACCU_FILE")
        echo "Tempo total acumulado até agora: $(format_time $accumulated_seconds)"
@@ -23,9 +48,22 @@ start_timer() {
        echo "0" > "$ACCU_FILE"
     fi
 
-    date +%s > "$FILE"
-    echo "Cronômetro iniciado às $(date "+%H:%M:%S")"
+    if [ -z "$start_time" ]; then
+        date +%s > "$FILE"
+        echo "Cronômetro iniciado às $(date "+%H:%M:%S")"
+    else
+    timestamp=$(get_timestamp_from_time "$start_time")
+    if [ -z "$timestamp" ]; then
+        echo "Falha ao obter o timestamp para $start_time."
+    else
+#        echo "O timestamp para $start_time é: $timestamp"
+        echo "$timestamp" > "$FILE"
+        echo "Cronômetro programado para iniciar às $start_time"
+    fi
+
+    fi
 }
+
 
 # Função para pausar o timer e acumular o tempo
 _pause_timer() {
@@ -90,7 +128,8 @@ stop_timer() {
 # Verifica o primeiro argumento passado para o script
 case "$1" in
     start)
-        start_timer
+        # Verifica se um segundo argumento (hh:MM) foi passado para o comando start
+        start_timer "$2"
         ;;
     pause)
         pause_timer
@@ -102,7 +141,7 @@ case "$1" in
         stop_timer
         ;;
     *)
-        echo "Uso: $0 {start|pause|check|stop}"
+        echo "Uso: $0 {start|pause|check|stop} [hh:MM para start]"
         exit 1
         ;;
 esac
