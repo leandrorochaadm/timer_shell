@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Caminho do arquivo onde o timestamp e o tempo acumulado serão salvos
-FILE="timestamp.txt"
-ACCU_FILE="accumulated.txt"
+FILE=".timer_timestamp.txt"
+ACCU_FILE=".timer_accumulated.txt"
 
 # Função para iniciar ou continuar o timer
 start_timer() {
@@ -18,8 +18,9 @@ start_timer() {
     echo "Cronômetro iniciado as $(date "+%H:%M:%S")"
 }
 
+
 # Função para pausar o timer e acumular o tempo
-pause_timer() {
+_pause_timer() {
     if [ ! -f "$FILE" ]; then
         echo "Primeiro é necessário iniciar o cronômetro, usando o comando 'start'"
         exit 1
@@ -37,6 +38,11 @@ pause_timer() {
     new_accumulated_seconds=$((accumulated_seconds + elapsed_seconds))
     echo "$new_accumulated_seconds" > "$ACCU_FILE"
     rm "$FILE"  # Deleta o arquivo de timestamp, para impedir que pause novamente sem antes atualizar o arquivo de timestamp
+}
+
+# Função para pausar o timer e acumular o tempo
+pause_timer() {
+    _pause_timer
     echo "Cronômetro pausado as $(date "+%H:%M:%S")"
     echo "Tempo total acumulado até agora: $(($new_accumulated_seconds / 3600)) hora(s) e $((($new_accumulated_seconds % 3600) / 60)) minuto(s)."
     echo "Para retomar o tempo de onde parou, execute o comando 'start'"
@@ -68,14 +74,14 @@ check_timer() {
 
 # Função para parar o timer e calcular o tempo total passado
 stop_timer() {
-    pause_timer  # Chama a função de pausar para atualizar o tempo acumulado
+    _pause_timer  # Chama a função de pausar para atualizar o tempo acumulado
     accumulated_seconds=$(cat "$ACCU_FILE")
     hours=$((accumulated_seconds / 3600))
     minutes=$(((accumulated_seconds % 3600) / 60))
 
     echo "Cronômetro parado as $(date "+%H:%M:%S")"
     echo "Tempo total: $hours hora(s) e $minutes minuto(s)."
-    rm "$FILE" "$ACCU_FILE"  # Limpa os arquivos para reiniciar o processo
+    rm "$ACCU_FILE"  # Limpa os arquivos para reiniciar o processo
 }
 
 # Verifica o primeiro argumento passado para o script
