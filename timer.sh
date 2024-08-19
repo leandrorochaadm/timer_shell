@@ -19,7 +19,7 @@ _set_environment() {
   # Cria o diretório da atividade se não existir
   mkdir -p "$ACTIVITY_DIR"
 
-#  printf "ACTIVITY: $ACTIVITY\nACTIVITY_DIR: $ACTIVITY_DIR\nFILE: $FILE\nACCU_FILE: $ACCU_FILE\n"
+  printf "ACTIVITY: $ACTIVITY\nACTIVITY_DIR: $ACTIVITY_DIR\nFILE: $FILE\nACCU_FILE: $ACCU_FILE\n"
 }
 
 # Função para formatar o tempo
@@ -54,8 +54,24 @@ get_timestamp_from_time() {
     fi
 }
 
+# Função para pausar todas as atividades ativas
+pause_all_other_activities() {
+    for dir in "$BASE_DIR"/*; do
+        if [ -d "$dir" ] && [ -f "$dir/timer_timestamp.txt" ]; then
+            activity_name=$(basename "$dir")
+            echo "Pausando atividade: $activity_name"
+            _set_environment "$activity_name"
+            _pause_timer
+        fi
+    done
+}
+
 # Função para iniciar ou continuar o timer
 start_timer() {
+
+    # Pausar todas as outras atividades ativas
+    pause_all_other_activities
+
     _set_environment "$1"
 
     local start_time="$2"
