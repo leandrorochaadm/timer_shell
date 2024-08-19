@@ -19,7 +19,7 @@ _set_environment() {
   # Cria o diretório da atividade se não existir
   mkdir -p "$ACTIVITY_DIR"
 
-  printf "ACTIVITY: $ACTIVITY\nACTIVITY_DIR: $ACTIVITY_DIR\nFILE: $FILE\nACCU_FILE: $ACCU_FILE\n"
+#  printf "ACTIVITY: $ACTIVITY\nACTIVITY_DIR: $ACTIVITY_DIR\nFILE: $FILE\nACCU_FILE: $ACCU_FILE\n"
 }
 
 # Função para formatar o tempo
@@ -160,6 +160,18 @@ stop_timer() {
     rm -Rf "$ACTIVITY_DIR"  # Limpa os arquivos para reiniciar o processo
 }
 
+# Função para verificar qual atividade está ativa
+active_activity() {
+    for dir in "$BASE_DIR"/*; do
+        if [ -d "$dir" ] && [ -f "$dir/timer_timestamp.txt" ]; then
+            activity_name=$(basename "$dir")
+            echo "Atividade ativa: $activity_name"
+            return
+        fi
+    done
+    echo "Nenhuma atividade está ativa no momento."
+}
+
 # Verifica o primeiro argumento passado para o script
 case "$1" in
     start)
@@ -175,8 +187,11 @@ case "$1" in
     stop)
         stop_timer "$2"
         ;;
+    active)
+        active_activity
+        ;;
     *)
-        echo "Uso: $0 {start|pause|check|stop} <nome_da_atividade> [hh:MM para start]"
+        echo "Uso: $0 {start|pause|check|stop|active} <nome_da_atividade> [hh:MM para start]"
         exit 1
         ;;
 esac
