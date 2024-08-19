@@ -174,20 +174,20 @@ active_activity() {
 
 # Verifica o primeiro argumento passado para o script
 case "$1" in
-    start)
+    s)
         # Verifica se um segundo argumento (hh:MM) foi passado para o comando start
         start_timer "$2" "$3"
         ;;
-    pause)
+    p)
         pause_timer "$2"
         ;;
-    check)
+    c)
         check_timer "$2"
         ;;
-    stop)
+    st)
         stop_timer "$2"
         ;;
-    active)
+    a)
         active_activity
         ;;
     *)
