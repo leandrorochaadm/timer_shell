@@ -1,8 +1,26 @@
 #!/bin/sh
 
-# Caminho do arquivo onde o timestamp e o tempo acumulado serão salvos
-FILE=".timer_timestamp.txt"
-ACCU_FILE=".timer_accumulated.txt"
+# Diretório base onde os temporizadores serão salvos
+BASE_DIR="./timers"
+
+# Variáveis globais
+ACTIVITY=""
+ACTIVITY_DIR=""
+FILE=""
+ACCU_FILE=""
+
+# Função para atribuir valor à variável global
+_set_environment() {
+  ACTIVITY="$1"
+  ACTIVITY_DIR="$BASE_DIR/$ACTIVITY"
+  FILE="$ACTIVITY_DIR/timer_timestamp.txt"
+  ACCU_FILE="$ACTIVITY_DIR/timer_accumulated.txt"
+
+  # Cria o diretório da atividade se não existir
+  mkdir -p "$ACTIVITY_DIR"
+
+#  printf "ACTIVITY: $ACTIVITY\nACTIVITY_DIR: $ACTIVITY_DIR\nFILE: $FILE\nACCU_FILE: $ACCU_FILE\n"
+}
 
 # Função para formatar o tempo
 format_time() {
@@ -38,8 +56,9 @@ get_timestamp_from_time() {
 
 # Função para iniciar ou continuar o timer
 start_timer() {
-    local start_time="$1"
+    _set_environment "$1"
 
+    local start_time="$2"
     if [ -f "$ACCU_FILE" ]; then
        accumulated_seconds=$(cat "$ACCU_FILE")
        echo "Tempo total acumulado até agora: $(format_time $accumulated_seconds)"
@@ -52,18 +71,15 @@ start_timer() {
         date +%s > "$FILE"
         echo "Cronômetro iniciado às $(date "+%H:%M:%S")"
     else
-    timestamp=$(get_timestamp_from_time "$start_time")
-    if [ -z "$timestamp" ]; then
-        echo "Falha ao obter o timestamp para $start_time."
-    else
-#        echo "O timestamp para $start_time é: $timestamp"
-        echo "$timestamp" > "$FILE"
-        echo "Cronômetro programado para iniciar às $start_time"
-    fi
-
+        timestamp=$(get_timestamp_from_time "$start_time")
+        if [ -z "$timestamp" ]; then
+            echo "Falha ao obter o timestamp para $start_time."
+        else
+            echo "$timestamp" > "$FILE"
+            echo "Cronômetro programado para iniciar às $start_time"
+        fi
     fi
 }
-
 
 # Função para pausar o timer e acumular o tempo
 _pause_timer() {
@@ -88,6 +104,7 @@ _pause_timer() {
 
 # Função para pausar o timer e acumular o tempo
 pause_timer() {
+    _set_environment "$1"
     _pause_timer
     echo "Cronômetro pausado às $(date "+%H:%M:%S")"
     echo "Tempo total acumulado até agora: $(format_time $new_accumulated_seconds)"
@@ -96,6 +113,7 @@ pause_timer() {
 
 # Função para verificar o tempo total acumulado até agora sem pausar
 check_timer() {
+    _set_environment "$1"
     if [ ! -f "$FILE" ] && [ -f "$ACCU_FILE" ];then
         total_seconds=$(cat "$ACCU_FILE")
         echo "Tempo total acumulado até agora: $(format_time $total_seconds)"
@@ -118,30 +136,31 @@ check_timer() {
 
 # Função para parar o timer e calcular o tempo total passado
 stop_timer() {
+    _set_environment "$1"
     _pause_timer  # Chama a função de pausar para atualizar o tempo acumulado
     accumulated_seconds=$(cat "$ACCU_FILE")
     echo "Cronômetro parado às $(date "+%H:%M:%S")"
     echo "Tempo total: $(format_time $accumulated_seconds)"
-    rm "$ACCU_FILE"  # Limpa os arquivos para reiniciar o processo
+    rm -Rf "$ACTIVITY_DIR"  # Limpa os arquivos para reiniciar o processo
 }
 
 # Verifica o primeiro argumento passado para o script
 case "$1" in
     start)
         # Verifica se um segundo argumento (hh:MM) foi passado para o comando start
-        start_timer "$2"
+        start_timer "$2" "$3"
         ;;
     pause)
-        pause_timer
+        pause_timer "$2"
         ;;
     check)
-        check_timer
+        check_timer "$2"
         ;;
     stop)
-        stop_timer
+        stop_timer "$2"
         ;;
     *)
-        echo "Uso: $0 {start|pause|check|stop} [hh:MM para start]"
+        echo "Uso: $0 {start|pause|check|stop} <nome_da_atividade> [hh:MM para start]"
         exit 1
         ;;
 esac
