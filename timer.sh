@@ -25,11 +25,16 @@ _set_environment() {
 # Função para formatar o tempo
 format_time() {
     local total_seconds=$1
-    local hours=$(($total_seconds / 3600))
-    local minutes=$((($total_seconds % 3600) / 60))
+#    local hours=$(($total_seconds / 3600))
+#    local minutes=$((($total_seconds % 3600) / 60))
     local seconds=$(($total_seconds % 60))
-    echo "$hours hora(s), $minutes minuto(s) e $seconds segundo(s)"
+
+    local minutes_total=$(($total_seconds / 60))
+    local money=$(echo "scale=2; $minutes_total * (36.8 / 60)" | bc)
+
+    echo "$minutes_total minutos(s) e $seconds segundos(s) = $money reais"
 }
+
 
 # Função que converte hora no formato "hh:MM" para timestamp Unix
 get_timestamp_from_time() {
