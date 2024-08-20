@@ -27,12 +27,12 @@ format_time() {
     local total_seconds=$1
 #    local hours=$(($total_seconds / 3600))
 #    local minutes=$((($total_seconds % 3600) / 60))
-    local seconds=$(($total_seconds % 60))
+#    local seconds=$(($total_seconds % 60))
 
-    local minutes_total=$(($total_seconds / 60))
+    local minutes_total=$(echo "scale=2; $total_seconds / 60" | bc)
     local money=$(echo "scale=2; $minutes_total * (36.8 / 60)" | bc)
 
-    echo "$minutes_total minutos(s) e $seconds segundos(s) = $money reais"
+    echo "$minutes_total minutos(s) = $money reais"
 }
 
 
