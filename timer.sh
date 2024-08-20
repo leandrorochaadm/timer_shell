@@ -177,6 +177,22 @@ active_activity() {
     echo "Nenhuma atividade está ativa no momento."
 }
 
+# Função para abrir o navegador no link especificado
+open_browser() {
+    local issue_number="$1"
+    local url="https://softohq.atlassian.net/browse/ENDFAAPP-$issue_number"
+
+    # Abrir o navegador
+    if command -v xdg-open > /dev/null; then
+        xdg-open "$url"  # Para sistemas Linux
+    elif command -v open > /dev/null; then
+        open "$url"  # Para macOS
+    else
+        echo "Não foi possível detectar o comando para abrir o navegador."
+        exit 1
+    fi
+}
+
 # Verifica o primeiro argumento passado para o script
 case "$1" in
     s)
@@ -195,8 +211,11 @@ case "$1" in
     a)
         active_activity
         ;;
+    o)
+        open_browser "$2"
+        ;;
     *)
-        echo "Uso: $0 {start|pause|check|stop|active} <nome_da_atividade> [hh:MM para start]"
+        echo "Uso: $0 {start|pause|check|stop|active|open} <nome_da_atividade> [hh:MM para start]"
         exit 1
         ;;
 esac
