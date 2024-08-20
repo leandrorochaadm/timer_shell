@@ -162,7 +162,7 @@ stop_timer() {
     accumulated_seconds=$(cat "$ACCU_FILE")
     echo "Cronômetro parado às $(date "+%H:%M:%S")"
     echo "Tempo total: $(format_time $accumulated_seconds)"
-    rm -Rf "$ACTIVITY_DIR"  # Limpa os arquivos para reiniciar o processo
+    rm -rf "$ACTIVITY_DIR"  # Limpa os arquivos para reiniciar o processo
 }
 
 # Função para verificar qual atividade está ativa
