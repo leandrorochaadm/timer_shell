@@ -160,9 +160,20 @@ stop_timer() {
     _set_environment "$1"
     _pause_timer  # Chama a função de pausar para atualizar o tempo acumulado
     accumulated_seconds=$(cat "$ACCU_FILE")
-    echo "Cronômetro parado às $(date "+%H:%M:%S")"
+    echo "Atividade $ACTIVITY finalizada às $(date "+%H:%M:%S")"
     echo "Tempo total: $(format_time $accumulated_seconds)"
     rm -rf "$ACTIVITY_DIR"  # Limpa os arquivos para reiniciar o processo
+}
+
+# Função para parar todas as atividades existentes
+stop_all_activities() {
+    for dir in "$BASE_DIR"/*; do
+        if [ -d "$dir" ]; then
+            activity_name=$(basename "$dir")
+            stop_timer "$activity_name"
+            echo "---------------------------"
+        fi
+    done
 }
 
 # Função para verificar qual atividade está ativa
@@ -233,7 +244,10 @@ case "$1" in
     c)
         check_timer "$2"
         ;;
-    st)
+    fa)
+        stop_all_activities
+        ;;
+    f)
         stop_timer "$2"
         ;;
     a)
