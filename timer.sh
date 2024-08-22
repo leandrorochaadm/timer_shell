@@ -25,15 +25,15 @@ _set_environment() {
 # Função para formatar o tempo
 format_time() {
     local total_seconds=$1
-#    local hours=$(($total_seconds / 3600))
-#    local minutes=$((($total_seconds % 3600) / 60))
+    local hours=$(($total_seconds / 3600))
+    local minutes=$((($total_seconds % 3600) / 60))
 #    local seconds=$(($total_seconds % 60))
 
-    local hours_total=$(echo "scale=4; $total_seconds /3600" | bc)
+#    local hours_total=$(echo "scale=4; $total_seconds /3600" | bc)
     local minutes_total=$(echo "scale=2; $total_seconds / 60" | bc)
     local money=$(echo "scale=2; $minutes_total * (36.8 / 60)" | bc)
 
-    echo "$hours_total h ou $minutes_total m =R$ $money"
+    echo "$hours horas $minutes minutos ou $minutes_total minutos = R$ $money"
 }
 
 
