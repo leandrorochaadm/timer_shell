@@ -29,10 +29,11 @@ format_time() {
 #    local minutes=$((($total_seconds % 3600) / 60))
 #    local seconds=$(($total_seconds % 60))
 
+    local hours_total=$(echo "scale=4; $total_seconds /3600" | bc)
     local minutes_total=$(echo "scale=2; $total_seconds / 60" | bc)
     local money=$(echo "scale=2; $minutes_total * (36.8 / 60)" | bc)
 
-    echo "$minutes_total minutos(s) = $money reais"
+    echo "$hours_total h ou $minutes_total m =R$ $money"
 }
 
 
@@ -90,14 +91,14 @@ start_timer() {
 
     if [ -z "$start_time" ]; then
         date +%s > "$FILE"
-        echo "Cronômetro iniciado às $(date "+%H:%M:%S")"
+        echo "Atividade $ACTIVITY iniciada às $(date "+%H:%M:%S")"
     else
         timestamp=$(get_timestamp_from_time "$start_time")
         if [ -z "$timestamp" ]; then
             echo "Falha ao obter o timestamp para $start_time."
         else
             echo "$timestamp" > "$FILE"
-            echo "Cronômetro programado para iniciar às $start_time"
+             echo "Atividade $ACTIVITY iniciada às $start_time"
         fi
     fi
 }
