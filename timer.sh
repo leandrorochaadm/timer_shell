@@ -176,6 +176,31 @@ stop_all_activities() {
     done
 }
 
+# Função para parar todas as atividades existentes com confirmação do usuário
+confirm_and_stop_all_activities() {
+    echo "Você realmente deseja finalizar todas as atividades? (s/n)"
+    read -r confirmation
+    if [ "$confirmation" = "s" ]; then
+        stop_all_activities
+        echo "Todas as atividades foram finalizadas."
+    else
+        echo "Nenhuma atividade foi finalizada."
+    fi
+}
+
+# Função para parar todas as atividades existentes com confirmação do usuário
+confirm_and_stop_activity() {
+   _set_environment "$1"
+    echo "Você realmente deseja finalizar a atividade $ACTIVITY? (s/n)"
+    read -r confirmation
+    if [ "$confirmation" = "s" ]; then
+        stop_timer $ACTIVITY
+#        echo "Todas as atividades foram finalizadas."
+    else
+        echo "A atividade $ACTIVITY não foi finalizada."
+    fi
+}
+
 # Função para verificar qual atividade está ativa
 active_activity() {
     for dir in "$BASE_DIR"/*; do
@@ -245,10 +270,10 @@ case "$1" in
         check_timer "$2"
         ;;
     fa)
-        stop_all_activities
+        confirm_and_stop_all_activities
         ;;
     f)
-        stop_timer "$2"
+        confirm_and_stop_activity "$2"
         ;;
     a)
         active_activity
