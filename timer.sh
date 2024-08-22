@@ -193,6 +193,34 @@ open_browser() {
     fi
 }
 
+# Função para listar todas as atividades e seus respectivos tempos acumulados e cronômetros
+list_all_activities() {
+    for dir in "$BASE_DIR"/*; do
+        if [ -d "$dir" ]; then
+            activity_name=$(basename "$dir")
+
+            _set_environment "$activity_name"
+
+            if [ -f "$ACCU_FILE" ]; then
+                accumulated_seconds=$(cat "$ACCU_FILE")
+            else
+                accumulated_seconds=0
+            fi
+
+            if [ -f "$FILE" ]; then
+                start_time=$(cat "$FILE")
+                current_time=$(date +%s)
+                elapsed_seconds=$((current_time - start_time))
+                total_seconds=$((accumulated_seconds + elapsed_seconds))
+                echo "Atividade: $activity_name | Tempo: $(format_time $total_seconds)"
+            else
+                echo "Atividade: $activity_name | Tempo: $(format_time $accumulated_seconds)"
+            fi
+            echo "---------------------------"
+        fi
+    done
+}
+
 # Verifica o primeiro argumento passado para o script
 case "$1" in
     s)
@@ -213,6 +241,9 @@ case "$1" in
         ;;
     o)
         open_browser "$2"
+        ;;
+    l)
+        list_all_activities
         ;;
     *)
         echo "Uso: $0 {start|pause|check|stop|active|open} <nome_da_atividade> [hh:MM para start]"
