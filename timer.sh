@@ -105,8 +105,8 @@ start_timer() {
 # Função para pausar o timer e acumular o tempo
 _pause_timer() {
     if [ ! -f "$FILE" ]; then
-        echo "Primeiro é necessário iniciar o cronômetro, usando o comando 'start'"
-        exit 1
+#        echo "Nenhum cronômetro em execução para a atividade '$ACTIVITY'."
+        return  # Sai da função sem interromper o script
     fi
 
     start_time=$(cat "$FILE")
