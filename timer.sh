@@ -232,6 +232,8 @@ open_browser() {
 
 # Função para listar todas as atividades e seus respectivos tempos acumulados e cronômetros
 list_all_activities() {
+    local total_time=0
+
     for dir in "$BASE_DIR"/*; do
         if [ -d "$dir" ]; then
             activity_name=$(basename "$dir")
@@ -249,14 +251,23 @@ list_all_activities() {
                 current_time=$(date +%s)
                 elapsed_seconds=$((current_time - start_time))
                 total_seconds=$((accumulated_seconds + elapsed_seconds))
-                echo "Atividade: $activity_name | Tempo: $(format_time $total_seconds)"
             else
-                echo "Atividade: $activity_name | Tempo: $(format_time $accumulated_seconds)"
+                total_seconds=$accumulated_seconds
             fi
+
+            echo "Atividade: $activity_name | Tempo: $(format_time $total_seconds)"
             echo "---------------------------"
+
+            # Somando o tempo total de todas as atividades
+            total_time=$((total_time + total_seconds))
         fi
     done
+
+    # Exibindo o somatório de todas as atividades
+    echo "Tempo total de todas as atividades: $(format_time $total_time)"
 }
+
+
 
 # Verifica o primeiro argumento passado para o script
 case "$1" in
