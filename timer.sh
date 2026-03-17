@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Diretório base onde os temporizadores serão salvos
-BASE_DIR="./timers"
+BASE_DIR="/home/monetizze/dev/timer_shell/timers"
 
 # Variáveis globais
 ACTIVITY=""
@@ -31,7 +31,9 @@ format_time() {
 
 #    local hours_total=$(echo "scale=4; $total_seconds /3600" | bc)
     local minutes_total=$(echo "scale=2; $total_seconds / 60" | bc)
-    local money=$(echo "scale=2; $minutes_total * (36.8 / 60)" | bc)
+
+# calcula o valor do salario pelo tempo aplicado na task
+    local money=$(echo "scale=2; $minutes_total * (60 / 60)" | bc)
 
     echo "$hours horas $minutes minutos ou $minutes_total minutos = R$ $money"
 }
@@ -217,7 +219,7 @@ active_activity() {
 # Função para abrir o navegador no link especificado
 open_browser() {
     local issue_number="$1"
-    local url="https://softohq.atlassian.net/browse/ENDFAAPP-$issue_number"
+    local url="https://clyvo-solutions.atlassian.net/browse/CMD-$issue_number"
 
     # Abrir o navegador
     if command -v xdg-open > /dev/null; then
